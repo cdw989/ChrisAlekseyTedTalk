@@ -1,0 +1,41 @@
+server:
+  port:
+    8080
+
+management:
+  security:
+    enabled:
+      false
+
+spring:
+  thymeleaf:
+    cache:
+      false
+      
+
+      
+info:
+    phone: 987-123-4455!!!
+    build: 
+
+
+      
+greeting:
+    message: Hello NFJS!!!
+
+---
+spring:
+  profiles: bos
+
+greeting:
+    message: Hello Boston!!!
+
+---
+spring:
+  profiles: bos
+
+greeting:
+  stl:
+    message: Hello St. Luis!!!
+
+    
