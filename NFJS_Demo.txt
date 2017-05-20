@@ -1,0 +1,175 @@
+1) Start New Spring Starter Project
+	a) Select Dev Tools, LomBok, H2, JPA, Web Dependencies;
+	b) add the folowing sections to pom.xml directly:
+	
+2) Create Controllers Package
+	a) Create HelloWorld controller
+===============================================================================	
+package com.example.controllers;
+
+import org.springframework.web.bind.annotation.GetMapping;
+//import org.springframework.web.bind.annotation.RequestMapping;
+//import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloWorld {
+	
+	@GetMapping("")
+	//@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String helloWorld()	{
+		return "Hello World";
+	}
+}
+===============================================================================	
+
+3) Create Book class as Entity
+===============================================================================	
+package com.example.entities;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.AccessLevel;
+import lombok.Data;
+
+@Entity
+@Data
+@NoArgsConstructor(access=AccessLevel.PRIVATE, force=true)
+@RequiredArgsConstructor
+public class Book {
+	
+	public Book (){}
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long Id;
+	
+	@NonNull private String isbn;
+	@NonNull private String title;
+	@NonNull private String author;
+	
+	public Book	(String isbn, String title, String author)	{
+		this.isbn = isbn;
+		this.title = title;
+		this.author = author;
+	}
+
+	public Long getId() {
+		return Id;
+	}
+
+	public String getIsbn() {
+		return isbn;
+	}
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
+	public String getAuthor() {
+		return author;
+	}
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+	
+}
+===============================================================================	
+
+4) Create Book Repository Interface
+===============================================================================	
+package com.example.repositories;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import com.example.entities.Book;
+
+public interface BookRepository extends CrudRepository <Book, Long> {
+	Book findByIsbn(String isbn);
+	
+	@Query("FROM Book b WHERE b.author LIKE '%Waugh%'")
+	List<Book> findWaughBooks();
+}
+===============================================================================	
+
+5) Create Load Repo on Start Up class
+===============================================================================	
+package com.example;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
+
+import com.example.entities.Book;
+import com.example.repositories.BookRepository;
+
+
+@Component
+public class AppContextListener implements ApplicationListener<ContextRefreshedEvent> {
+
+	private BookRepository repo;
+
+    @Autowired
+    public AppContextListener(BookRepository repo) {
+		this.repo = repo;
+    }
+    
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) { 
+		repo.save(new Book("978-1-61729-254-5", "Spring Boot in Action", "Craig Walls"));
+		repo.save(new Book("978-1-617291-20-3", "Spring in Action", "Craig Walls"));
+
+		repo.save(new Book("978-1-234567-89-0", "My Best Book", "Chris Waugh"));
+    }
+}
+===============================================================================	
+
+6) Create BookController Class
+===============================================================================	
+package com.example.controllers;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.entities.Book;
+import com.example.repositories.BookRepository;
+
+@RestController
+@RequestMapping("/books")
+public class BookController {
+
+	private BookRepository repo;
+
+	public BookController(BookRepository repo)	{
+		this.repo = repo;
+	}
+	
+	@GetMapping
+	public Iterable<Book> allBooks()	{
+		return repo.findAll();
+	}
+
+	@GetMapping("/Waugh")
+	public Iterable<Book> allWaughBooks()	{
+		return repo.findWaughBooks();
+	}
+
+}
+===============================================================================	

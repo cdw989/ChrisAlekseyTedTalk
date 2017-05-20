@@ -33,6 +33,10 @@ public class Book {
 		this.author = author;
 	}
 
+	public Long getId() {
+		return Id;
+	}
+
 	public String getIsbn() {
 		return isbn;
 	}
