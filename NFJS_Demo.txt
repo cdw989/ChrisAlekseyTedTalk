@@ -32,16 +32,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.AccessLevel;
-import lombok.Data;
-
 @Entity
-@Data
-@NoArgsConstructor(access=AccessLevel.PRIVATE, force=true)
-@RequiredArgsConstructor
 public class Book {
 	
 	public Book (){}
@@ -50,9 +41,9 @@ public class Book {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long Id;
 	
-	@NonNull private String isbn;
-	@NonNull private String title;
-	@NonNull private String author;
+	private String isbn;
+	private String title;
+	private String author;
 	
 	public Book	(String isbn, String title, String author)	{
 		this.isbn = isbn;
@@ -171,5 +162,177 @@ public class BookController {
 		return repo.findWaughBooks();
 	}
 
+}
+===============================================================================	
+
+
+
+
+
+
+
+7) Add Author Entity
+===============================================================================	
+package com.example.entities;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
+public class Author {
+	
+	public Author (){}
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long Id;
+	
+	private String name;
+
+	public Author	(String name)	{
+		this.name = name;
+	}
+
+	public Long getId() {
+		return Id;
+	}
+
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+}
+===============================================================================	
+
+8) Add Author Repository
+===============================================================================	
+package com.example.repositories;
+
+import org.springframework.data.repository.CrudRepository;
+
+import com.example.entities.Author;
+
+public interface AuthorRepository extends CrudRepository <Author, Long> {
+
+}
+===============================================================================	
+
+9) Change Book Entiry to include Author as class instead of String
+===============================================================================	
+package com.example.entities;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
+public class Book {
+	
+	public Book (){}
+
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long Id;
+	
+	private String isbn;
+	private String title;
+	@ManyToOne
+	private Author author;
+	
+	public Book	(String isbn, String title, Author author)	{
+		this.isbn = isbn;
+		this.title = title;
+		this.author = author;
+	}
+
+	public Long getId() {
+		return Id;
+	}
+
+	public String getIsbn() {
+		return isbn;
+	}
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
+	public Author getAuthor() {
+		return author;
+	}
+	public void setAuthor(Author author) {
+		this.author = author;
+	}
+}
+===============================================================================	
+
+10) Change Book Repository
+===============================================================================	
+package com.example.repositories;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import com.example.entities.Book;
+
+public interface BookRepository extends CrudRepository <Book, Long> {
+	Book findByIsbn(String isbn);
+	
+	@Query("FROM Book b WHERE b.author.name LIKE '%Waugh%'")
+	List<Book> findWaughBooks();
+}
+===============================================================================	
+
+11) Update Load Repo on Start Up class
+===============================================================================	
+package com.example;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
+
+import com.example.entities.Author;
+import com.example.entities.Book;
+import com.example.repositories.AuthorRepository;
+import com.example.repositories.BookRepository;
+
+
+@Component
+public class AppContextListener implements ApplicationListener<ContextRefreshedEvent> {
+
+	private BookRepository bookRepo;
+
+	private AuthorRepository authorRepo;
+
+    @Autowired
+    public AppContextListener(BookRepository bookRepo, AuthorRepository authorRepo) {
+		this.bookRepo = bookRepo;
+		this.authorRepo = authorRepo;
+    }
+    
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+    	Author author = authorRepo.save(new Author("Craig Walls"));
+    	bookRepo.save(new Book("978-1-61729-254-5", "Spring Boot in Action", author));
+    	bookRepo.save(new Book("978-1-617291-20-3", "Spring in Action", author));
+
+    	author = authorRepo.save(new Author("Chris Waugh"));
+    	bookRepo.save(new Book("978-1-234567-89-0", "My Best Book", author));
+    }
 }
 ===============================================================================	

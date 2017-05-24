@@ -4,17 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.AccessLevel;
-import lombok.Data;
+import javax.persistence.ManyToOne;
 
 @Entity
-@Data
-@NoArgsConstructor(access=AccessLevel.PRIVATE, force=true)
-@RequiredArgsConstructor
 public class Book {
 	
 	public Book (){}
@@ -23,11 +15,12 @@ public class Book {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long Id;
 	
-	@NonNull private String isbn;
-	@NonNull private String title;
-	@NonNull private String author;
+	private String isbn;
+	private String title;
+	@ManyToOne
+	private Author author;
 	
-	public Book	(String isbn, String title, String author)	{
+	public Book	(String isbn, String title, Author author)	{
 		this.isbn = isbn;
 		this.title = title;
 		this.author = author;
@@ -51,11 +44,10 @@ public class Book {
 		this.title = title;
 	}
 	
-	public String getAuthor() {
+	public Author getAuthor() {
 		return author;
 	}
-	public void setAuthor(String author) {
+	public void setAuthor(Author author) {
 		this.author = author;
 	}
-	
 }

@@ -10,7 +10,7 @@ import com.example.entities.Book;
 public interface BookRepository extends CrudRepository <Book, Long>, BookRepositoryCustom {
 	Book findByIsbn(String isbn);
 	
-	@Query("FROM Book b WHERE b.author LIKE '%Waugh%'")
+	@Query("FROM Book b WHERE b.author.name LIKE '%Waugh%'")
 	List<Book> findWaughBooks();
 
 	List<Book> findDistinctBooksByTitle(String title);
