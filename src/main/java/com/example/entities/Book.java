@@ -8,46 +8,43 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class Book {
-	
-	public Book (){}
 
+	private final String API = "/api/v1/books/";
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long Id;
-	
+	private Long id;
 	private String isbn;
 	private String title;
-	@ManyToOne
+	private String edition;
+	@ManyToOne	
 	private Author author;
 	
-	public Book	(String isbn, String title, Author author)	{
+	public Book(){}
+	
+	public Book	(String isbn, String title, String edition, Author author)	{
 		this.isbn = isbn;
 		this.title = title;
 		this.author = author;
+		this.edition = edition;
 	}
 
 	public Long getId() {
-		return Id;
+		return id;
 	}
-
 	public String getIsbn() {
 		return isbn;
 	}
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
+	public String getLocation() {
+		return API + id;
 	}
-	
 	public String getTitle() {
 		return title;
 	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	
+	public String getEdition() {
+		return edition;
+	}	
 	public Author getAuthor() {
 		return author;
 	}
-	public void setAuthor(Author author) {
-		this.author = author;
-	}
+	
 }

@@ -8,26 +8,34 @@ import javax.persistence.Id;
 @Entity
 public class Author {
 	
-	public Author (){}
+	public Author() {}
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long Id;
 	
-	private String name;
-
-	public Author	(String name)	{
-		this.name = name;
+	private String firstName;
+	private String lastName;
+	
+	public Author(String firstName, String lastName)	{
+		this.firstName = firstName;
+		this.lastName = lastName;
 	}
 
-	public Long getId() {
-		return Id;
+	public String getFirstName() {
+		return firstName;
+	}
+	
+	public String getLastName() {
+		return lastName;
 	}
 
-	public String getName() {
-		return name;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
+
 }
