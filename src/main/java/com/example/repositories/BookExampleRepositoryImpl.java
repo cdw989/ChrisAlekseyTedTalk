@@ -7,7 +7,7 @@ public class BookExampleRepositoryImpl implements BookExampleRepositoryCustom {
 	public Boolean checkBook(Book book) {
 		return book.getId() != null && 
 			   book.getIsbn() != null && 
-			   book.getLocation() != null && 
+			   book.getApi() != null && 
 			   book.getTitle() != null;		
 	}
 
