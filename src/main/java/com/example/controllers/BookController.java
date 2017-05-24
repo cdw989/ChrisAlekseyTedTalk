@@ -1,6 +1,7 @@
 package com.example.controllers;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +38,13 @@ public class BookController {
 	public Book addBook(@RequestParam("isbn") String isbn, @RequestParam("title") String title, @RequestParam(name="edition", required=false) String edition, @RequestParam(name="firstName") String firstName, @RequestParam(name="lastName", required=false) String lastName) {
     	Author author = authorRepo.save(new Author(firstName, lastName));
     	return bookRepo.save(new Book(isbn, title, edition, author));
+	}
+
+    @RequestMapping(value="/{id}", method = RequestMethod.PUT)
+	public Book updateBook(@PathVariable Long id, @RequestBody Book book) {
+    	Author author = authorRepo.save(new Author(book.getAuthor().getFirstName(), book.getAuthor().getLastName()));
+    	Book updatedBook = new Book(book.getId(), book.getIsbn(), book.getTitle(), book.getEdition(), author);
+    	return bookRepo.save(updatedBook);
 	}
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)

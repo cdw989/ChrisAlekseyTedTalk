@@ -29,5 +29,25 @@ public class BookExampleController {
 	public List<Book> findByAuthorFirstName(@PathVariable String firstName)	{
 		return bookRepo.findByAuthor_FirstName(firstName);
 	}
+	
+	@RequestMapping(value="/count/{firstName}", method = RequestMethod.GET)
+	public Long countByAuthorLastName(@PathVariable String firstName)	{
+		return bookRepo.countByAuthorFirstName(firstName);
+	}
+	
+	@RequestMapping(value="/javaQuery", method = RequestMethod.GET)
+	public List<Book> findJavaBooksQuery()	{
+		return bookRepo.findJavaBooksQuery();
+	}
+	
+	@RequestMapping(value="/contains/{title}", method = RequestMethod.GET)
+	public List<Book> findJavaBooksByTitleContains(@PathVariable String title)	{
+		return bookRepo.findJavaBooksByTitleContains(title);
+	}
+	
+	@RequestMapping(value="/distinct/{firstName}", method = RequestMethod.GET)
+	public List<Book> findDistinctBooksByAuthorFirstName(@PathVariable String firstName)	{
+		return bookRepo.findDistinctBooksByAuthorFirstName(firstName);
+	}
 
 }

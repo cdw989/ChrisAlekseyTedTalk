@@ -27,6 +27,14 @@ public class Book {
 		this.author = author;
 		this.edition = edition;
 	}
+	
+	public Book	(Long id, String isbn, String title, String edition, Author author)	{
+		this.id = id;
+		this.isbn = isbn;
+		this.title = title;
+		this.author = author;
+		this.edition = edition;
+	}
 
 	public Long getId() {
 		return id;

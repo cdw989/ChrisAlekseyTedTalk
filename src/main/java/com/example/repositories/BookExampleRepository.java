@@ -14,13 +14,15 @@ public interface BookExampleRepository extends CrudRepository<Book, Long>, BookE
 	List<Book> findByAuthorFirstName(String firstName);
 	List<Book> findByAuthor_FirstName(String firstName);
 	
-	Long countByAuthorLastName(String lastName);
+	Long countByAuthorFirstName(String firstName);
 	
-	@Query("FROM Book b WHERE b.author LIKE '%Waugh%'")
-	List<Book> findWaughBooks();
+	@Query("FROM Book b WHERE b.title LIKE '%Java%'")
+	List<Book> findJavaBooksQuery();
+	
+	List<Book> findJavaBooksByTitleContains(String title);
 
-	List<Book> findDistinctBooksByTitle(String title);
-	List<Book> findBooksDistinctByTitle(String title);
+	List<Book> findDistinctBooksByAuthorFirstName(String firstName);
+	List<Book> findBooksDistinctByAuthorFirstName(String firstName);
 
 	List<Book> findByTitleIgnoreCase(String title);
 	List<Book> findByTitleOrIsbnAllIgnoreCase(String title, String isbn);
