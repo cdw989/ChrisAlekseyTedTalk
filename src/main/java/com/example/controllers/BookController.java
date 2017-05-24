@@ -24,7 +24,16 @@ public class BookController {
 
 	@GetMapping("/Waugh")
 	public Iterable<Book> allWaughBooks()	{
+		repo.customMethod();
+		
 		return repo.findWaughBooks();
+	}
+
+	@GetMapping("/custom")
+	public Iterable<Book> custom()	{
+		repo.customMethod();
+		
+		return repo.findAll();
 	}
 
 }
