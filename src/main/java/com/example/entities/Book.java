@@ -42,7 +42,7 @@ public class Book {
 	public String getIsbn() {
 		return isbn;
 	}
-	public String getLocation() {
+	public String getApi() {
 		return API + id;
 	}
 	public String getTitle() {
