@@ -743,8 +743,10 @@ public class BookExampleController {
 	public Book addBook(@RequestParam("isbn") String isbn, @RequestParam("title") String title, @RequestParam(name="edition", required=false) String edition, @RequestParam(name="firstName") String firstName, @RequestParam(name="lastName", required=false) String lastName) {
     	Author author = authorRepo.save(new Author(firstName, lastName));
     	Book book = new Book(isbn, title, edition, author);
-    	if(!bookRepo.hasValidBook(book))
+    	if(!bookRepo.hasValidBook(book)) {
     		System.out.println("Invalid Book");
+    		return book;
+    	}
     	return bookRepo.save(book);
 	}
 
