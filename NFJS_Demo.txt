@@ -1,30 +1,35 @@
 1) Start New Spring Starter Project
-	a) Select Dev Tools, LomBok, H2, JPA, Web Dependencies;
+	a) Select Dev Tools, H2, JPA, Web Dependencies;
 	b) add the folowing sections to pom.xml directly:
+	c) Create Packages:
+		controllers
+		entities
+		repositories
 	
-2) Create Controllers Package
-	a) Create HelloWorld controller
+2) Create HelloWorld controller
 ===============================================================================	
+
 package com.example.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/hello")
 public class HelloWorld {
 	
-	@GetMapping("")
-	//@RequestMapping(value = "/", method = RequestMethod.GET)
+	@GetMapping
 	public String helloWorld()	{
 		return "Hello World";
 	}
+	
 }
-===============================================================================	
 
+===============================================================================	
 3) Create Book class as Entity
 ===============================================================================	
+
 package com.example.entities;
 
 import javax.persistence.Entity;
@@ -54,21 +59,18 @@ public class Book {
 	public Long getId() {
 		return Id;
 	}
-
 	public String getIsbn() {
 		return isbn;
 	}
 	public void setIsbn(String isbn) {
 		this.isbn = isbn;
-	}
-	
+	}	
 	public String getTitle() {
 		return title;
 	}
 	public void setTitle(String title) {
 		this.title = title;
-	}
-	
+	}	
 	public String getAuthor() {
 		return author;
 	}
@@ -77,10 +79,11 @@ public class Book {
 	}
 	
 }
-===============================================================================	
 
+===============================================================================	
 4) Create Book Repository Interface
 ===============================================================================	
+
 package com.example.repositories;
 
 import java.util.List;
@@ -91,15 +94,18 @@ import org.springframework.data.repository.CrudRepository;
 import com.example.entities.Book;
 
 public interface BookRepository extends CrudRepository <Book, Long> {
+
 	Book findByIsbn(String isbn);
 	
 	@Query("FROM Book b WHERE b.author LIKE '%Waugh%'")
 	List<Book> findWaughBooks();
+	
 }
-===============================================================================	
 
+===============================================================================	
 5) Create Load Repo on Start Up class
 ===============================================================================	
+
 package com.example;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,11 +134,13 @@ public class AppContextListener implements ApplicationListener<ContextRefreshedE
 
 		repo.save(new Book("978-1-234567-89-0", "My Best Book", "Chris Waugh"));
     }
+	
 }
-===============================================================================	
 
+===============================================================================	
 6) Create BookController Class
 ===============================================================================	
+
 package com.example.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -163,16 +171,11 @@ public class BookController {
 	}
 
 }
+
 ===============================================================================	
-
-
-
-
-
-
-
 7) Add Author Entity
-===============================================================================	
+===============================================================================
+	
 package com.example.entities;
 
 import javax.persistence.Entity;
@@ -183,33 +186,39 @@ import javax.persistence.Id;
 @Entity
 public class Author {
 	
-	public Author (){}
+	public Author() {}
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long Id;
+
+	private String firstName;
+	private String lastName;
 	
-	private String name;
-
-	public Author	(String name)	{
-		this.name = name;
+	public Author(String firstName, String lastName)	{
+		this.firstName = firstName;
+		this.lastName = lastName;
 	}
 
-	public Long getId() {
-		return Id;
+	public String getFirstName() {
+		return firstName;
+	}	
+	public String getLastName() {
+		return lastName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}	
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
 }
-===============================================================================	
 
+===============================================================================	
 8) Add Author Repository
 ===============================================================================	
+
 package com.example.repositories;
 
 import org.springframework.data.repository.CrudRepository;
@@ -219,10 +228,11 @@ import com.example.entities.Author;
 public interface AuthorRepository extends CrudRepository <Author, Long> {
 
 }
-===============================================================================	
 
+===============================================================================	
 9) Change Book Entiry to include Author as class instead of String
 ===============================================================================	
+
 package com.example.entities;
 
 import javax.persistence.Entity;
@@ -233,17 +243,16 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class Book {
-	
-	public Book (){}
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
-	private Long Id;
-	
+	private Long id;
 	private String isbn;
 	private String title;
-	@ManyToOne
+	@ManyToOne	
 	private Author author;
+	
+	public Book(){}
 	
 	public Book	(String isbn, String title, Author author)	{
 		this.isbn = isbn;
@@ -252,34 +261,24 @@ public class Book {
 	}
 
 	public Long getId() {
-		return Id;
+		return id;
 	}
-
 	public String getIsbn() {
 		return isbn;
 	}
-	public void setIsbn(String isbn) {
-		this.isbn = isbn;
-	}
-	
 	public String getTitle() {
 		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	
+	}	
 	public Author getAuthor() {
 		return author;
 	}
-	public void setAuthor(Author author) {
-		this.author = author;
-	}
+	
 }
-===============================================================================	
 
+===============================================================================	
 10) Change Book Repository
 ===============================================================================	
+
 package com.example.repositories;
 
 import java.util.List;
@@ -289,16 +288,121 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.example.entities.Book;
 
-public interface BookRepository extends CrudRepository <Book, Long> {
-	Book findByIsbn(String isbn);
+public interface BookRepository extends CrudRepository<Book, Long> {
 	
-	@Query("FROM Book b WHERE b.author.name LIKE '%Waugh%'")
+	@Query("FROM Book b WHERE b.author.lastName LIKE '%Waugh%'")
 	List<Book> findWaughBooks();
+
 }
+
+===============================================================================	
+11) Change Load
 ===============================================================================	
 
-11) Update Load Repo on Start Up class
+package com.example;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
+
+import com.example.entities.Author;
+import com.example.entities.Book;
+import com.example.repositories.AuthorRepository;
+import com.example.repositories.BookRepository;
+
+
+@Component
+public class AppContextListener implements ApplicationListener<ContextRefreshedEvent> {
+
+	private BookRepository bookRepo;
+	private AuthorRepository authorRepo;
+
+    @Autowired
+    public AppContextListener(BookRepository bookRepo, AuthorRepository authorRepo) {
+		this.bookRepo = bookRepo;
+		this.authorRepo = authorRepo;
+    }
+    
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) { 
+    	Author craig = authorRepo.save(new Author("Craig", "Walls"));
+    	bookRepo.save(new Book("978-1-61729-254-5", "Spring Boot in Action", craig));
+    	bookRepo.save(new Book("978-1-617291-20-3", "Spring in Action", craig));
+
+    	Author chris = authorRepo.save(new Author("Chris", "Waugh"));
+    	bookRepo.save(new Book("978-1-234567-89-0", "My Best Book", chris));
+    }
+	
+}
+
 ===============================================================================	
+12) Change Book Repository
+===============================================================================	
+
+package com.example.entities;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+
+@Entity
+public class Book {
+
+	private final String API = "/api/v1/books/";
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	private Long id;
+	private String isbn;
+	private String title;
+	private String edition;
+	@ManyToOne	
+	private Author author;
+	
+	public Book(){}
+	
+	public Book	(String isbn, String title, String edition, Author author)	{
+		this.isbn = isbn;
+		this.title = title;
+		this.author = author;
+		this.edition = edition;
+	}
+	
+	public Book	(Long id, String isbn, String title, String edition, Author author)	{
+		this.id = id;
+		this.isbn = isbn;
+		this.title = title;
+		this.author = author;
+		this.edition = edition;
+	}
+
+	public Long getId() {
+		return id;
+	}
+	public String getIsbn() {
+		return isbn;
+	}
+	public String getApi() {
+		return API + id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public String getEdition() {
+		return edition;
+	}	
+	public Author getAuthor() {
+		return author;
+	}
+	
+}
+
+===============================================================================	
+13) Update Load Repo on Start Up class
+===============================================================================	
+
 package com.example;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -320,19 +424,333 @@ public class AppContextListener implements ApplicationListener<ContextRefreshedE
 	private AuthorRepository authorRepo;
 
     @Autowired
-    public AppContextListener(BookRepository bookRepo, AuthorRepository authorRepo) {
-		this.bookRepo = bookRepo;
+    public AppContextListener(BookRepository bookRealRepo, AuthorRepository authorRepo) {
+		this.bookRepo = bookRealRepo;
 		this.authorRepo = authorRepo;
     }
     
-    @Override
+	@Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-    	Author author = authorRepo.save(new Author("Craig Walls"));
-    	bookRepo.save(new Book("978-1-61729-254-5", "Spring Boot in Action", author));
-    	bookRepo.save(new Book("978-1-617291-20-3", "Spring in Action", author));
-
-    	author = authorRepo.save(new Author("Chris Waugh"));
-    	bookRepo.save(new Book("978-1-234567-89-0", "My Best Book", author));
+		initializeRepos();
     }
+	
+	private void initializeRepos() {
+    	Author craig = authorRepo.save(new Author("Craig", "Walls"));
+    	bookRepo.save(new Book("978-1-61729-254-5", "Spring Boot in Action", "4th", craig));
+    	bookRepo.save(new Book("978-1-617291-20-3", "Spring in Action", "5th", craig));
+    	
+    	Author craig2 = authorRepo.save(new Author("Craig", "Other"));
+    	bookRepo.save(new Book("978-1-61729-254-4", "Other Craigs Book", "1st", craig2));
+
+    	Author me = authorRepo.save(new Author("Chris", "Waugh"));
+    	bookRepo.save(new Book("978-1-234567-89-0", "My Best Book", null, me));
+    	
+    	Author alan = authorRepo.save(new Author("Alan", " Mycroft"));
+    	bookRepo.save(new Book("978-1617291999", "Java 8 in Action: Lambdas, Streams, and functional-style programming", null, alan));
+    	
+    	Author joshua = authorRepo.save(new Author("Joshua", "Bloch"));
+    	bookRepo.save(new Book("978-0321356680", "Effective Java", "2nd", joshua));
+    	
+    	Author robert = authorRepo.save(new Author("Robert", "Liguori"));
+    	bookRepo.save(new Book("978-1491900864", "Java 8 Pocket Guide: Instant Help for Java Programmers", "1st", robert));
+
+    	Author tomasz = authorRepo.save(new Author("Tomasz", "Nurkiewicz"));
+    	bookRepo.save(new Book("978-1491900864", "Reactive Programming with RxJava: Creating Asynchronous, Event-Based Applications", "1st", tomasz));
+	}
+	
 }
+
 ===============================================================================	
+14) Update Book Controller to final CRUD form
+===============================================================================	
+
+package com.example.controllers;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.entities.Author;
+import com.example.entities.Book;
+import com.example.repositories.AuthorRepository;
+import com.example.repositories.BookRepository;
+
+@RestController
+@RequestMapping("/api/v1/books")
+public class BookController {
+
+	private BookRepository bookRepo;
+	private AuthorRepository authorRepo;
+
+	public BookController(BookRepository bookRepo, AuthorRepository authorRepo)	{
+		this.bookRepo = bookRepo;
+		this.authorRepo = authorRepo;
+	}
+	
+	@RequestMapping(method = RequestMethod.GET)
+	public Iterable<Book> getList()	{
+		return bookRepo.findAll();
+	}
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public Book getBook(@PathVariable Long id) {
+		return bookRepo.findOne(id);
+	}
+
+    @RequestMapping(method = RequestMethod.POST)
+	public Book addBook(@RequestParam("isbn") String isbn, @RequestParam("title") String title, @RequestParam(name="edition", required=false) String edition, @RequestParam(name="firstName") String firstName, @RequestParam(name="lastName", required=false) String lastName) {
+    	Author author = authorRepo.save(new Author(firstName, lastName));
+    	return bookRepo.save(new Book(isbn, title, edition, author));
+	}
+
+    @RequestMapping(value="/{id}", method = RequestMethod.PUT)
+	public Book updateBook(@PathVariable Long id, @RequestBody Book book) {
+    	Author author = authorRepo.save(new Author(book.getAuthor().getFirstName(), book.getAuthor().getLastName()));
+    	Book updatedBook = new Book(book.getId(), book.getIsbn(), book.getTitle(), book.getEdition(), author);
+    	return bookRepo.save(updatedBook);
+	}
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	public void removeBook(@PathVariable Long id) {
+		bookRepo.delete(id);
+	}
+	
+	@RequestMapping(value="/Waugh", method = RequestMethod.GET)
+	public Iterable<Book> findWaughBooks()	{
+		return bookRepo.findWaughBooks();
+	}
+
+}
+
+===============================================================================	
+15) Add Book Example Repository
+===============================================================================	
+
+package com.example.repositories;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import com.example.entities.Book;
+
+public interface BookExampleRepository extends CrudRepository<Book, Long> {
+	
+	@Query("FROM Book b WHERE b.author.lastName LIKE '%Waugh%'")
+	List<Book> findWaughBooks();
+	
+	Book findByIsbn(String isbn);
+
+	List<Book> findByAuthorFirstName(String firstName);
+	List<Book> findByAuthor_FirstName(String firstName);
+	
+	Long countByAuthorFirstName(String firstName);
+	
+	@Query("FROM Book b WHERE b.title LIKE '%Java%'")
+	List<Book> findJavaBooksQuery();
+	
+	List<Book> findJavaBooksByTitleContains(String title);
+
+	List<Book> findDistinctBooksByAuthorFirstName(String firstName);
+	List<Book> findBooksDistinctByAuthorFirstName(String firstName);
+
+	List<Book> findByTitleIgnoreCase(String title);
+	List<Book> findByTitleOrIsbnAllIgnoreCase(String title, String isbn);
+	
+	List<Book> findFirstBooksByAuthorFirstName(String firstName);
+	List<Book> findFirst3BooksByAuthorFirstName(String firstName);
+	List<Book> findTopBooksByAuthorFirstName(String firstName);
+	List<Book> findTop2BooksByAuthorFirstName(String firstName);
+
+	List<Book> findBooksByTitleOrderByAuthorFirstNameAsc(String title);
+	List<Book> findBooksByTitleOrderByAuthorFirstNameDesc(String title);
+	
+}
+
+===============================================================================	
+16) Add Controller for Book Example
+===============================================================================	
+
+package com.example.controllers;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.entities.Book;
+import com.example.repositories.BookExampleRepository;
+
+@RestController
+@RequestMapping("/api/v1/booksExample")
+public class BookExampleController {
+
+	private BookExampleRepository bookRepo;
+
+	public BookExampleController(BookExampleRepository bookRepo)	{
+		this.bookRepo = bookRepo;
+	}
+	
+	@RequestMapping(value="/Waugh", method = RequestMethod.GET)
+	public Iterable<Book> findWaughBooks()	{
+		return bookRepo.findWaughBooks();
+	}
+	
+	@RequestMapping(value="/isbn/{isbn}", method = RequestMethod.GET)
+	public Book findByIsbn(@PathVariable String isbn)	{
+		return bookRepo.findByIsbn(isbn);
+	}
+	
+	@RequestMapping(value="/firstName/{firstName}", method = RequestMethod.GET)
+	public List<Book> findByAuthorFirstName(@PathVariable String firstName)	{
+		return bookRepo.findByAuthor_FirstName(firstName);
+	}
+	
+	@RequestMapping(value="/count/{firstName}", method = RequestMethod.GET)
+	public Long countByAuthorLastName(@PathVariable String firstName)	{
+		return bookRepo.countByAuthorFirstName(firstName);
+	}
+	
+	@RequestMapping(value="/javaQuery", method = RequestMethod.GET)
+	public List<Book> findJavaBooksQuery()	{
+		return bookRepo.findJavaBooksQuery();
+	}
+	
+	@RequestMapping(value="/contains/{title}", method = RequestMethod.GET)
+	public List<Book> findJavaBooksByTitleContains(@PathVariable String title)	{
+		return bookRepo.findJavaBooksByTitleContains(title);
+	}
+	
+	@RequestMapping(value="/distinct/{firstName}", method = RequestMethod.GET)
+	public List<Book> findDistinctBooksByAuthorFirstName(@PathVariable String firstName)	{
+		return bookRepo.findDistinctBooksByAuthorFirstName(firstName);
+	}
+
+}
+
+===============================================================================	
+17) Add Custom Book Example Repository Interface
+===============================================================================	
+
+package com.example.repositories;
+
+import com.example.entities.Book;
+
+public interface BookExampleRepositoryCustom {
+
+	public Boolean hasValidBook(Book book);
+
+}
+
+===============================================================================	
+18) Add Custom Book Example Repository Implementation
+===============================================================================	
+
+package com.example.repositories;
+
+import com.example.entities.Book;
+
+public class BookExampleRepositoryImpl implements BookExampleRepositoryCustom {
+
+	public Boolean hasValidBook(Book book) {
+		return book.getTitle() != null && 
+			   book.getIsbn() != null && 
+			   book.getAuthor().getFirstName() != null && 
+			   book.getAuthor().getLastName() != null;	
+	}
+
+}
+
+===============================================================================	
+19) Extend BookExampleRepositoryCustom
+===============================================================================	
+
+public interface BookExampleRepository extends CrudRepository<Book, Long>, BookExampleRepositoryCustom {
+
+===============================================================================	
+20) Call checkBook
+===============================================================================	
+
+package com.example.controllers;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.entities.Author;
+import com.example.entities.Book;
+import com.example.repositories.AuthorRepository;
+import com.example.repositories.BookExampleRepository;
+
+@RestController
+@RequestMapping("/api/v1/booksExample")
+public class BookExampleController {
+
+	private BookExampleRepository bookRepo;
+	private AuthorRepository authorRepo;
+
+	public BookExampleController(BookExampleRepository bookRepo, AuthorRepository authorRepo)	{
+		this.bookRepo = bookRepo;
+		this.authorRepo = authorRepo;
+	}
+	
+	@RequestMapping(value="/Waugh", method = RequestMethod.GET)
+	public Iterable<Book> findWaughBooks()	{
+		return bookRepo.findWaughBooks();
+	}
+	
+	@RequestMapping(value="/isbn/{isbn}", method = RequestMethod.GET)
+	public Book findByIsbn(@PathVariable String isbn)	{
+		return bookRepo.findByIsbn(isbn);
+	}
+	
+	@RequestMapping(value="/firstName/{firstName}", method = RequestMethod.GET)
+	public List<Book> findByAuthorFirstName(@PathVariable String firstName)	{
+		return bookRepo.findByAuthor_FirstName(firstName);
+	}
+	
+	@RequestMapping(value="/count/{firstName}", method = RequestMethod.GET)
+	public Long countByAuthorLastName(@PathVariable String firstName)	{
+		return bookRepo.countByAuthorFirstName(firstName);
+	}
+	
+	@RequestMapping(value="/javaQuery", method = RequestMethod.GET)
+	public List<Book> findJavaBooksQuery()	{
+		return bookRepo.findJavaBooksQuery();
+	}
+	
+	@RequestMapping(value="/contains/{title}", method = RequestMethod.GET)
+	public List<Book> findJavaBooksByTitleContains(@PathVariable String title)	{
+		return bookRepo.findJavaBooksByTitleContains(title);
+	}
+	
+	@RequestMapping(value="/distinct/{firstName}", method = RequestMethod.GET)
+	public List<Book> findDistinctBooksByAuthorFirstName(@PathVariable String firstName)	{
+		return bookRepo.findDistinctBooksByAuthorFirstName(firstName);
+	}
+
+    @RequestMapping(method = RequestMethod.POST)
+	public Book addBook(@RequestParam("isbn") String isbn, @RequestParam("title") String title, @RequestParam(name="edition", required=false) String edition, @RequestParam(name="firstName") String firstName, @RequestParam(name="lastName", required=false) String lastName) {
+    	Author author = authorRepo.save(new Author(firstName, lastName));
+    	Book book = new Book(isbn, title, edition, author);
+    	if(!bookRepo.hasValidBook(book))
+    		System.out.println("Invalid Book");
+    	return bookRepo.save(book);
+	}
+
+}
+
+
+
+
+

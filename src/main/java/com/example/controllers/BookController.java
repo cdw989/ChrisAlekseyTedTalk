@@ -51,5 +51,10 @@ public class BookController {
 	public void removeBook(@PathVariable Long id) {
 		bookRepo.delete(id);
 	}
+	
+	@RequestMapping(value="/waugh", method = RequestMethod.GET)
+	public Iterable<Book> findWaughBooks()	{
+		return bookRepo.findWaughBooks();
+	}
 
 }

@@ -4,11 +4,11 @@ import com.example.entities.Book;
 
 public class BookExampleRepositoryImpl implements BookExampleRepositoryCustom {
 
-	public Boolean checkBook(Book book) {
-		return book.getId() != null && 
+	public Boolean hasValidBook(Book book) {
+		return book.getTitle() != null && 
 			   book.getIsbn() != null && 
-			   book.getApi() != null && 
-			   book.getTitle() != null;		
+			   book.getAuthor().getFirstName() != null && 
+			   book.getAuthor().getLastName() != null;		
 	}
 
 }

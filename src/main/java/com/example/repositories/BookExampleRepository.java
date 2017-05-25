@@ -8,6 +8,9 @@ import org.springframework.data.repository.CrudRepository;
 import com.example.entities.Book;
 
 public interface BookExampleRepository extends CrudRepository<Book, Long>, BookExampleRepositoryCustom {
+
+	@Query("FROM Book b WHERE b.author.lastName LIKE '%Waugh%'")
+	List<Book> findWaughBooks();
 	
 	Book findByIsbn(String isbn);
 
