@@ -752,7 +752,23 @@ public class BookExampleController {
 
 }
 
+===============================================================================	
+21) Add actuator
+===============================================================================	
 
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
 
+management.security.enabled=false
+info.test.name=AppName
+
+localhost:8080/health
+localhost:8080/info
+localhost:8080/beans
+localhost:8080/trace
+localhost:8080/autoconfig
+localhost:8080/metrics
 
 
